@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Analyzer", "Analyzer\Analyzer.csproj", "{A475CB92-478D-4087-BCDB-2B8E88EE5A54}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Buffers", "Buffers\Buffers.csproj", "{2EC1485F-5762-43C7-A6F9-6C640891B5D6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Buffers.Tests", "Buffers.Tests\Buffers.Tests.csproj", "{C626B68D-5F7E-49FB-975C-F7F37104F1FE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A475CB92-478D-4087-BCDB-2B8E88EE5A54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A475CB92-478D-4087-BCDB-2B8E88EE5A54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A475CB92-478D-4087-BCDB-2B8E88EE5A54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A475CB92-478D-4087-BCDB-2B8E88EE5A54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2EC1485F-5762-43C7-A6F9-6C640891B5D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2EC1485F-5762-43C7-A6F9-6C640891B5D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2EC1485F-5762-43C7-A6F9-6C640891B5D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2EC1485F-5762-43C7-A6F9-6C640891B5D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C626B68D-5F7E-49FB-975C-F7F37104F1FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C626B68D-5F7E-49FB-975C-F7F37104F1FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C626B68D-5F7E-49FB-975C-F7F37104F1FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C626B68D-5F7E-49FB-975C-F7F37104F1FE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

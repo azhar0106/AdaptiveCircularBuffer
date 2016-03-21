@@ -1,0 +1,49 @@
+﻿<UserControl x:Class="Analyzer.ControlPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Analyzer"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0" Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Vertical" Grid.Row="0">
+                <Label Content="Write Rate:"/>
+                <Slider x:Name="WriteRateSlider" Minimum="0" Maximum="1024" Value="0" SmallChange="16" LargeChange="128"
+                        TickFrequency="16" IsSnapToTickEnabled="True" ValueChanged="WriteRateSlider_ValueChanged"/>
+                <Label x:Name="WriteRateSliderLabel" Content="{Binding ElementName=WriteRateSlider, Path=Value}"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical" Grid.Row="1">
+                <Label Content="Read Rate:"/>
+                <Slider x:Name="ReadRateSlider" Minimum="0" Maximum="1024" Value="0" SmallChange="16" LargeChange="128"
+                        TickFrequency="16" IsSnapToTickEnabled="True" ValueChanged="ReadRateSlider_ValueChanged"/>
+                <Label x:Name="ReadRateSliderLabel" Content="{Binding ElementName=ReadRateSlider, Path=Value}"/>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Column="1" Margin="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.Resources>
+                <Style TargetType="{x:Type Button}">
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="Margin" Value="5"/>
+                </Style>
+            </Grid.Resources>
+            <Button x:Name="StartButton" Content="Start" Grid.Column="0" Click="StartButton_Click"/>
+            <Button x:Name="PauseButton" Content="Pause" Grid.Column="1" Click="PauseButton_Click"/>
+            <Button x:Name="StopButton" Content="Stop" Grid.Column="2" Click="StopButton_Click"/>
+        </Grid>
+    </Grid>
+</UserControl>

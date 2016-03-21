@@ -1,0 +1,60 @@
+﻿<UserControl x:Class="Analyzer.Parameters"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Analyzer">
+    <StackPanel Orientation="Horizontal">
+        <StackPanel.Resources>
+            <Style TargetType="Label" x:Key="LabelStyle">
+                <Setter Property="FontSize" Value="10"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                <Setter Property="Width" Value="80"/>
+            </Style>
+            <Style TargetType="Label" x:Key="ValueStyle">
+                <Setter Property="FontSize" Value="16"/>
+                <Setter Property="FontWeight" Value="Light"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+            </Style>
+            <Style TargetType="Label" x:Key="UnitStyle">
+                <Setter Property="FontSize" Value="10"/>
+                <Setter Property="FontWeight" Value="Normal"/>
+                <Setter Property="VerticalAlignment" Value="Stretch"/>
+                <Setter Property="VerticalContentAlignment" Value="Bottom"/>
+            </Style>
+            <Style TargetType="StackPanel" x:Key="ValueUnitStackStyle">
+                <Setter Property="Orientation" Value="Vertical"/>
+            </Style>
+        </StackPanel.Resources>
+        <StackPanel>
+            <Label Content="Write Rate" Style="{StaticResource LabelStyle}"/>
+            <StackPanel Style="{StaticResource ValueUnitStackStyle}">
+                <Label x:Name="WriteRateLabel" Content="0" Style="{StaticResource ValueStyle}"/>
+                <Label Content="bytes/sec" Style="{StaticResource UnitStyle}"/>
+            </StackPanel>
+        </StackPanel>
+        <StackPanel>
+            <Label Content="Read Rate" Style="{StaticResource LabelStyle}"/>
+            <StackPanel Style="{StaticResource ValueUnitStackStyle}">
+                <Label x:Name="ReadRateLabel" Content="0" Style="{StaticResource ValueStyle}"/>
+                <Label Content="bytes/sec" Style="{StaticResource UnitStyle}"/>
+            </StackPanel>
+        </StackPanel>
+        <StackPanel>
+            <Label Content="Buffer Size" Style="{StaticResource LabelStyle}"/>
+            <StackPanel Style="{StaticResource ValueUnitStackStyle}">
+                <Label x:Name="BufferSizeLabel" Content="0" Style="{StaticResource ValueStyle}"/>
+                <Label Content="bytes" Style="{StaticResource UnitStyle}"/>
+            </StackPanel>
+        </StackPanel>
+        <StackPanel>
+            <Label Content="Allocation Rate" Style="{StaticResource LabelStyle}"/>
+            <StackPanel Style="{StaticResource ValueUnitStackStyle}">
+                <Label x:Name="AllocationRateLabel" Content="0" Style="{StaticResource ValueStyle}"/>
+                <Label Content="bytes/sec" Style="{StaticResource UnitStyle}"/>
+            </StackPanel>
+        </StackPanel>
+    </StackPanel>
+</UserControl>
