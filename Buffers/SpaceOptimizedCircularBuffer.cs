@@ -5,6 +5,11 @@ using System.Text;
 
 namespace Buffers
 {
+    /// <summary>
+    /// Circular buffer whose size adjust to the requirement.
+    /// However, there is an upper limit upto which the size can increase.
+    /// </summary>
+    /// <typeparam name="T">Any value type can be stored in the buffer.</typeparam>
     public class SpaceOptimizedCircularBuffer<T> where T : struct
     {
         protected int m_blockSize;                              // Size of a block.
@@ -18,7 +23,18 @@ namespace Buffers
         protected int m_blockWriteHead;                         // Write-head position in the block. [Written]
         protected T m_invalidValuePlaceholder;                  // Value for no-data.
 
-
+        /// <summary>
+        /// Constructor to initialize the buffer.
+        /// </summary>
+        /// <param name="blockSize">Size of a block.</param>
+        /// <param name="maximumBufferSize">
+        /// Maximum size of the buffer is always integral multiple of the blockSize.
+        /// The integral multiple is a minimum value required to accomodate maximumBufferSize.
+        /// </param>
+        /// <param name="invalidValuePlaceHolder">
+        /// This value in the buffer represents non-written data unit.
+        /// Useful for debugging.
+        /// </param>
         public SpaceOptimizedCircularBuffer(int blockSize, int maximumBufferSize, T invalidValuePlaceHolder)
         {
             CheckParameters(blockSize, maximumBufferSize);
@@ -36,22 +52,53 @@ namespace Buffers
             m_invalidValuePlaceholder = invalidValuePlaceHolder;
         }
 
-        public virtual Boolean Write(T data)
+        protected virtual void CheckParameters(int blockSize, int maximumBufferSize)
         {
-            if (m_dataSize == m_maximumBufferSize)
+            if (blockSize <= 0)
+            {
+                throw new ArgumentException("Block size cannot be zero or less.", nameof(blockSize));
+            }
+
+            if (maximumBufferSize <= 0)
+            {
+                throw new ArgumentException("Maximum buffer size cannot be zero or less.", nameof(maximumBufferSize));
+            }
+        }
+
+        /// <summary>
+        /// Writes a data unit to the buffer.
+        /// </summary>
+        /// <param name="data">Data unit to be written.</param>
+        /// <returns>
+        /// Returns true only if data is successfully written.
+        /// Returns false if buffer has reached maximum size and there's no empty unit.
+        /// </returns>
+        public virtual bool Write(T data)
+        {
+            // Data cannot be written if buffer has reached maximum size and there's no empty unit.
+            if (m_dataSize == m_maximumBufferSize) // Buffer is full and reached its limit.
             {
                 return false;
             }
-            else
+            else // Buffer size is not at max.
             {
-                // Add block if required.
+                /* WriteHead is always at the previously written data.
+                 * Hence, head is moved forward first to write data.
+                 * 
+                 * A new block is added if buffer is full.
+                 * This behaviour can be overriden by derived classes.
+                 */
+
+                // Add a block if required.
                 AddBlock();
 
-                // Move ahead
+                // Move write head forward.
                 MoveHead(ref m_blockWriteHead, ref m_blockListWriteHead);
 
-                // Write data
+                // Write data at the write head.
                 m_blockListWriteHead.Value[m_blockWriteHead] = data;
+
+                // Increase the data size.
                 m_dataSize++;
 
 
@@ -59,58 +106,82 @@ namespace Buffers
             }
         }
 
-        public virtual Boolean Read(ref T data)
+        /// <summary>
+        /// Reads a data unit from the buffer.
+        /// </summary>
+        /// <param name="data">Read data unit.</param>
+        /// <returns>
+        /// Returns true only if data is read successfully.
+        /// Returns false if buffer is empty.
+        /// </returns>
+        public virtual bool Read(ref T data)
         {
-            if (m_dataSize == 0)
+            // Data cannot be read if buffer is empty.
+            if (m_dataSize == 0) // Buffer is empty.
             {
                 return false;
             }
-            else
+            else // Buffer is not empty.
             {
-                // Read data
+                /* Read head is always at where the next data unit would be read from.
+                 * Hence, data is first written then the head is moved.
+                 * 
+                 * A block is removed as soon as buffer has empty units equal to block size.
+                 * This behaviour can be overriden by the derived classes.
+                 */
+
+                // Read data at the read head.
                 data = m_blockListReadHead.Value[m_blockReadHead];
                 m_blockListReadHead.Value[m_blockReadHead] = m_invalidValuePlaceholder;
+
+                // Decrease the data size.
                 m_dataSize--;
 
-                // Move ahead
+                // Move read head forward.
                 MoveHead(ref m_blockReadHead, ref m_blockListReadHead);
 
-                // Remove block if required
+                // Remove block if required.
                 RemoveBlock();
 
                 return true;
             }
         }
 
-        protected virtual void CheckParameters(int blockSize, int maximumBufferSize)
-        {
-            if (blockSize <= 0)
-            {
-                throw new ArgumentException("Block size cannot be zero or less.", nameof(blockSize));
-            }
-            if (maximumBufferSize <= 0)
-            {
-                throw new ArgumentException("Maximum buffer size cannot be zero or less.", nameof(maximumBufferSize));
-            }
-        }
-
+        /// <summary>
+        /// Checks if a block should be added. Adds if needed.
+        /// </summary>
         protected virtual void AddBlock()
         {
-            if (m_dataSize == m_bufferSize) // buffer is full
+            // Add a block only if buffer is full.
+            if (m_dataSize == m_bufferSize)
             {
                 // Add block
                 LinkedListNode<T[]> addedBlock;
                 T[] newBlock = CreateBlock();
 
-                if (m_blockList.Count == 0)
+                
+                if (m_blockList.Count == 0) // Empty buffer / No blocks
                 {
                     addedBlock = m_blockList.AddFirst(newBlock);
                     m_blockListWriteHead = addedBlock;
                     m_blockListReadHead = addedBlock;
                 }
-                else if (m_blockWriteHead < m_blockSize - 1)
+                else if (m_blockWriteHead < m_blockSize - 1) // Last written unit is not at the end of the block
                 {
+                    /*  v^
+                     * DDDDD DDDDD
+                     *  v      ^
+                     * DDOOO OODDD DDDDD
+                     */
+
+                    // A new block is added after the current block.
+                    // The data unit present after the last written unit are shifted to newly added block.
                     addedBlock = m_blockList.AddAfter(m_blockListWriteHead, newBlock);
+
+                    // Since, write head was not at the end of the block and buffer is full,
+                    // the read head has to be in the same block.
+                    // Now that a new block is added and data is shifted,
+                    // the read head should also be shifted.
                     MoveBlockListHead(ref m_blockListReadHead);
 
                     // Shift data
@@ -120,15 +191,25 @@ namespace Buffers
                         m_blockListWriteHead.Value[i] = m_invalidValuePlaceholder;
                     }
                 }
-                else
+                else // Last written unit is at the end of the block.
                 {
+                    /*     v ^
+                     * DDDDD DDDDD
+                     *     v       ^
+                     * DDDDD OOOOO DDDDD
+                     */
+
                     m_blockList.AddAfter(m_blockListWriteHead, newBlock);
                 }
 
+                // Increase the buffer size by block size.
                 m_bufferSize += m_blockSize;
             }
         }
 
+        /// <summary>
+        /// Check's if a block should be removed. Removes if needed.
+        /// </summary>
         protected virtual void RemoveBlock()
         {
             if (m_bufferSize - m_dataSize == m_blockSize) // buffer is empty of (blocksize) length.
@@ -163,15 +244,25 @@ namespace Buffers
             }
         }
 
+        /// <summary>
+        /// Moves the head forward.
+        /// </summary>
+        /// <param name="blockHead">Reference to block head.</param>
+        /// <param name="blockListHead">Reference to block-list head.</param>
         protected void MoveHead(ref int blockHead, ref LinkedListNode<T[]> blockListHead)
         {
-            if (blockHead == m_blockSize - 1)
+            if (blockHead == m_blockSize - 1) // Block head is at the end of the block.
             {
+                // If block head is at the end of the block,
+                // move to next block.
+
                 blockHead = 0;
                 MoveBlockListHead(ref blockListHead);
             }
-            else
+            else // Block head is not at the end of the block.
             {
+                // If block head is not at the end of the block,
+                // simply move the block head forward.
                 blockHead++;
             }
         }
