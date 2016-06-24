@@ -8,7 +8,7 @@ namespace Buffers.Tests
     public class SpaceOptimizedCircularBufferTests
     {
         virtual protected SpaceOptimizedCircularBuffer<T>
-            InitBuffer<T>(int blockSize, int maximumBufferSize, T invalidValuePlaceHolder)
+        InitBuffer<T>(int blockSize, int maximumBufferSize, T invalidValuePlaceHolder)
             where T : struct
         {
             return new SpaceOptimizedCircularBuffer<T>(blockSize, maximumBufferSize, invalidValuePlaceHolder);
@@ -106,6 +106,93 @@ namespace Buffers.Tests
             Assert.AreEqual(false, result);
         }
 
+        [TestMethod]
+        public void TestingMethod_Write_BufferFull()
+        {
+            int blockSize = 2;
+            int maxBufferSize = blockSize * 2;
+
+            var buffer = InitBuffer<int>(blockSize, maxBufferSize, -1); // block-size, max-buffer-size, invalid value placeholder
+            
+            bool result = true;
+
+            for(int i=1; i<=maxBufferSize; i++)
+            {
+                result = buffer.Write(i);
+                Assert.AreEqual(true, result);
+            }
+
+            result = buffer.Write(maxBufferSize + 1);
+            Assert.AreEqual(false, result);
+
+            int temp = 0;
+            for (int i = 1; i <= maxBufferSize; i++)
+            {
+                result = buffer.Read(ref temp);
+                Assert.AreEqual(true, result);
+                Assert.AreEqual(i, temp);
+            }
+        }
+
+        [TestMethod]
+        public void TestingMethod_Read_BufferEmpty()
+        {
+            int blockSize = 2;
+            int maxBufferSize = blockSize * 4; //8
+            int writeReadSize = 8;
+
+            var buffer = InitBuffer<int>(blockSize, maxBufferSize, -1); // block-size, max-buffer-size, invalid value placeholder
+
+            bool result = true;
+            
+            for (int i = 1; i <= writeReadSize; i++)
+            {
+                result = buffer.Write(i);
+                Assert.AreEqual(true, result);
+            }
+
+            int temp = 0;
+            for (int i = 1; i <= writeReadSize; i++)
+            {
+                result = buffer.Read(ref temp);
+                Assert.AreEqual(true, result);
+                Assert.AreEqual(i, temp);
+            }
+
+            result = buffer.Read(ref temp);
+            Assert.AreEqual(false, result);
+        }
+
+        [TestMethod]
+        public void TestingMethod_Write_Read_BufferNotFull()
+        {
+            int blockSize = 2;
+            int maxBufferSize = blockSize * 4; //8
+            int writeReadSize = 7;
+            int writeReadCycles = 3;
+
+            var buffer = InitBuffer<int>(blockSize, maxBufferSize, -1); // block-size, max-buffer-size, invalid value placeholder
+
+            bool result = true;
+
+            for (int c = 0; c < writeReadCycles; c++)
+            {
+                for (int i = 1; i <= writeReadSize; i++)
+                {
+                    result = buffer.Write(i);
+                    Assert.AreEqual(true, result);
+                }
+
+                int temp = 0;
+                for (int i = 1; i <= writeReadSize; i++)
+                {
+                    result = buffer.Read(ref temp);
+                    Assert.AreEqual(true, result);
+                    Assert.AreEqual(i, temp);
+                }
+            }
+        }
+        
         [TestMethod]
         public void TestShift()
         {
