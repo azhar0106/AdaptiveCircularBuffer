@@ -7,7 +7,7 @@ namespace Buffers
 {
     /// <summary>
     /// Circular buffer whose size adjust to the requirement.
-    /// However, there is an upper limit upto which the size can increase.
+    /// However, there is an upper limit to which the size can increase.
     /// </summary>
     /// <typeparam name="T">Any value type can be stored in the buffer.</typeparam>
     public class SpaceOptimizedCircularBuffer<T> where T : struct
@@ -29,7 +29,7 @@ namespace Buffers
         /// <param name="blockSize">Size of a block.</param>
         /// <param name="maximumBufferSize">
         /// Maximum size of the buffer is always integral multiple of the blockSize.
-        /// The integral multiple is a minimum value required to accomodate maximumBufferSize.
+        /// The integral multiple is a minimum value required to accommodate maximumBufferSize.
         /// </param>
         /// <param name="invalidValuePlaceHolder">
         /// This value in the buffer represents non-written data unit.
@@ -86,7 +86,7 @@ namespace Buffers
                  * Hence, head is moved forward first to write data.
                  * 
                  * A new block is added if buffer is full.
-                 * This behaviour can be overriden by derived classes.
+                 * This behavior can be overridden by derived classes.
                  */
 
                 // Add a block if required.
@@ -127,7 +127,7 @@ namespace Buffers
                  * Hence, data is first written then the head is moved.
                  * 
                  * A block is removed as soon as buffer has empty units equal to block size.
-                 * This behaviour can be overriden by the derived classes.
+                 * This behavior can be overridden by the derived classes.
                  */
 
                 // Read data at the read head.
@@ -174,7 +174,7 @@ namespace Buffers
                      * DDOOO OODDD DDDDD
                      */
 
-                    // A new block is added after the current block.
+                    // A new block is added after the current read-block.
                     // The data unit present after the last written unit are shifted to newly added block.
                     addedBlock = m_blockList.AddAfter(m_blockListWriteHead, newBlock);
 
@@ -212,7 +212,7 @@ namespace Buffers
         /// </summary>
         protected virtual void RemoveBlock()
         {
-            if (m_bufferSize - m_dataSize == m_blockSize) // buffer is empty of (blocksize) length.
+            if (m_bufferSize - m_dataSize == m_blockSize) // buffer is empty of (block size) length.
             {
                 LinkedListNode<T[]> removedBlock;
 
@@ -223,10 +223,23 @@ namespace Buffers
                     m_blockListReadHead = null;
                     m_blockListWriteHead = null;
                 }
-                else if (m_blockReadHead > 0)
+                else if (m_blockReadHead > 0) // Portion of block has data
                 {
+                    /*    v      ^
+                     * DDDDO OOOOD DDDDD
+                     *          v^
+                     *       DDDDD DDDDD
+                     */
+
+                    // Previous block of the read-block is removed
+                    // and the data in that block is shifted to the read-block
                     removedBlock = m_blockListReadHead.Previous ?? m_blockList.Last;
+                    
+                    // In this case, the previous block has to be the current write-block.
+                    // Write head is advanced as this block will be removed.
                     MoveBlockListHead(ref m_blockListWriteHead);
+
+                    // Remove the block
                     m_blockList.Remove(removedBlock);
 
                     // Shift data
@@ -235,11 +248,18 @@ namespace Buffers
                         m_blockListReadHead.Value[i] = removedBlock.Value[i];
                     }
                 }
-                else
+                else // Complete block is empty
                 {
+                    /*     v       ^
+                     * DDDDD OOOOO DDDDD
+                     *     v ^
+                     * DDDDD DDDDD
+                     */
+
                     m_blockList.Remove(m_blockListReadHead.Previous ?? m_blockList.Last);
                 }
 
+                // Decrease the buffer size by block size.
                 m_bufferSize -= m_blockSize;
             }
         }
@@ -267,6 +287,10 @@ namespace Buffers
             }
         }
 
+        /// <summary>
+        /// Moves the block-list head forward.
+        /// </summary>
+        /// <param name="blockListHead">Reference to block-list head.</param>
         protected void MoveBlockListHead(ref LinkedListNode<T[]> blockListHead)
         {
             if (blockListHead.Next == null)
@@ -279,21 +303,35 @@ namespace Buffers
             }
         }
 
+        /// <summary>
+        /// Creates an empty block.
+        /// The data units are initialized with invalid-value-placeholder.
+        /// </summary>
+        /// <returns>An empty block.</returns>
         protected T[] CreateBlock()
         {
             return Enumerable.Repeat<T>(m_invalidValuePlaceholder, m_blockSize).ToArray();
         }
 
+        /// <summary>
+        /// Returns the data size.
+        /// </summary>
         public int DataSize
         {
             get { return m_dataSize; }
         }
 
+        /// <summary>
+        /// Returns the buffer size.
+        /// </summary>
         public virtual int BufferSize
         {
             get { return m_bufferSize; }
         }
 
+        /// <summary>
+        /// Returns the block-count.
+        /// </summary>
         public int BlockCount
         {
             get { return m_blockList.Count; }
