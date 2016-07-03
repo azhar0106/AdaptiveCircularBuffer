@@ -72,18 +72,9 @@ namespace Buffers
 
         private void RemoveBlocks()
         {
-            while ((m_blockListReadHead.Previous ?? m_blockList.Last) != m_blockListWriteHead)
+            while (m_bufferSize - m_dataSize >= m_blockSize * 2)
             {
-                m_blockList.Remove(m_blockListReadHead.Previous ?? m_blockList.Last);
-                m_bufferSize -= m_blockSize;
-            }
-        }
-
-        public override int BufferSize
-        {
-            get
-            {
-                return m_bufferSize;
+                base.RemoveBlock();
             }
         }
     }
