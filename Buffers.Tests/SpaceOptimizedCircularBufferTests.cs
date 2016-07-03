@@ -342,15 +342,6 @@ namespace Buffers.Tests
         }
 
         [TestMethod]
-        public void TestBufferSize()
-        {
-            var buffer = InitBuffer<int>(2, 2, -1);
-
-            int size = buffer.BufferSize;
-            Assert.AreEqual(0, size);
-        }
-
-        [TestMethod]
         public void TestGetDataSize()
         {
             var buffer = InitBuffer<int>(2, 2, -1);
@@ -360,7 +351,16 @@ namespace Buffers.Tests
         }
 
         [TestMethod]
-        public void TestBlockCount()
+        public virtual void TestBufferSize()
+        {
+            var buffer = InitBuffer<int>(2, 2, -1);
+
+            int size = buffer.BufferSize;
+            Assert.AreEqual(0, size);
+        }
+
+        [TestMethod]
+        public virtual void TestBlockCount()
         {
             var buffer = InitBuffer<int>(2, 2, -1);
 

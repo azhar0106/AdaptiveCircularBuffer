@@ -16,5 +16,24 @@ namespace Buffers.Tests
         {
             
         }
+
+
+        [TestMethod]
+        public override void TestBufferSize()
+        {
+            var buffer = InitBuffer<int>(2, 2, -1);
+
+            int size = buffer.BufferSize;
+            Assert.AreEqual(2, size);
+        }
+
+        [TestMethod]
+        public override void TestBlockCount()
+        {
+            var buffer = InitBuffer<int>(2, 2, -1);
+
+            int size = buffer.BlockCount;
+            Assert.AreEqual(1, size);
+        }
     }
 }
