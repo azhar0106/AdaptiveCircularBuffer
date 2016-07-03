@@ -54,7 +54,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="DropHoldNoShiftSpaceOptimizedCircularBufferTests.cs" />
-    <Compile Include="NoShiftSpaceOptimizedCircularBuffer.cs" />
+    <Compile Include="NoShiftSpaceOptimizedCircularBufferTests.cs" />
     <Compile Include="SpaceOptimizedCircularBufferTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

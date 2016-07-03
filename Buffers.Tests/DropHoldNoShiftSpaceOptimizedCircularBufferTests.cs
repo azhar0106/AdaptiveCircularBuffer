@@ -5,7 +5,7 @@ using Buffers;
 namespace Buffers.Tests
 {
     [TestClass]
-    public class DropHoldNoShiftSpaceOptimizedCircularBufferTests : NoShiftSpaceOptimizedCircularBuffer
+    public class DropHoldNoShiftSpaceOptimizedCircularBufferTests : NoShiftSpaceOptimizedCircularBufferTests
     {
         protected override SpaceOptimizedCircularBuffer<T> InitBuffer<T>(int blockSize, int maximumBufferSize, T invalidValuePlaceHolder)
         {
